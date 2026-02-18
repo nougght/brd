@@ -6,6 +6,7 @@ struct TabId
 {
     unsigned int value;
     explicit TabId(unsigned int value_);
+    TabId(TabId &other);
     bool operator==(const TabId& other) const;
 };
 
