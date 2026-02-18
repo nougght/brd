@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QVBoxLayout>
+#include "core/BrowserCore.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -9,6 +10,17 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCentralWidget(_centralWidget);
 
     _search = new QLineEdit(_centralWidget);
+    _page = new QWebEngineView(_centralWidget);
+
+    _core = std::make_unique<BrowserCore>();
+    _activeTabId = _core->createTab(Url("https://google.com"));
+
+    // подписка на событие из core
+    _core->goToWebsite.subscribe(
+        [this](std::string url){
+            this->onGoToWebsite(QString::fromStdString(url));});
+
+
     connect(_search, &QLineEdit::editingFinished, this,
             &MainWindow::onSearchEditingFinished
         // [&](){
@@ -16,12 +28,11 @@ MainWindow::MainWindow(QWidget *parent)
         //     goToWebsite(adr);}
     );
 
-    centralLayout->addWidget(_search);
-    _page = new QWebEngineView(_centralWidget);
-    goToWebsite("https://github.com/");
     connect(_page, &QWebEngineView::urlChanged, this, &MainWindow::onUrlChanged);
-    this->setMinimumSize(1000, 700);
+
+    centralLayout->addWidget(_search);
     centralLayout->addWidget(_page);
+    this->setMinimumSize(1000, 700);
 
 }
 
@@ -32,10 +43,11 @@ void MainWindow::onUrlChanged(QUrl newUrl)
 
 void MainWindow::onSearchEditingFinished()
 {
-    goToWebsite(_search->text());
+    // goToWebsite(_search->text());
+    _core->visitUrl(_activeTabId, Url(_search->text().toStdString()));
 }
 
-void MainWindow::goToWebsite(QString address)
+void MainWindow::onGoToWebsite(QString address)
 {
     _page->load(QUrl(address));
 }
