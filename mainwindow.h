@@ -4,6 +4,13 @@
 #include <QMainWindow>
 #include <QLineEdit>
 #include <QWebEngineView>
+#include <memory>
+
+
+#include "core/BrowserCore.h"
+#include "core/Url.h"
+#include "core/TabId.h"
+#include "core/Event.h"
 
 class MainWindow : public QMainWindow
 {
@@ -17,9 +24,12 @@ public slots:
     void onUrlChanged(QUrl newUrl);
 private:
     void setupUI();
-    void goToWebsite(QString address);
+    void onGoToWebsite(QString address);
     QWidget * _centralWidget;
     QLineEdit * _search;
     QWebEngineView * _page;
+
+    std::unique_ptr<BrowserCore> _core;
+    TabId _activeTabId;
 };
 #endif // MAINWINDOW_H
