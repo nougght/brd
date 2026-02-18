@@ -3,7 +3,7 @@
 
 #include "HandlerId.h"
 #include <unordered_map>
-
+#include <functional>
 
 template <typename T>
 class Event;
@@ -16,7 +16,7 @@ private:
     HandlerId _handlerId;
 public:
     Subscription(Event<T>& event, HandlerId id)
-        : _event(&event), _id(id)
+        : _event(&event), _handlerId(id)
     {}
     // запрет копирования
     Subscription(Subscription& other) = delete;
@@ -67,6 +67,13 @@ public:
     }
 
     
+    void emit(T& data)
+    {
+        for (auto hndl : _handlers)
+        {
+            hndl.second(data);
+        }
+    }
 
 };
 #endif

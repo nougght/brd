@@ -5,12 +5,16 @@
 class Url
 {
 private:
-    std::string _url;
+    std::string _value;
 public:
-    explicit Url(std::string url) : _url(url)
+    explicit Url(std::string value) : _value(value)
     {
     }
 
+    std::string toStdString()
+    {
+        return _value;
+    }
 
 };
 #endif

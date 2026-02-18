@@ -71,3 +71,50 @@ const std::vector<TabId> &TabManager::getTabsOrder()
 {
     return _tabsOrder;
 }
+
+bool TabManager::canGoBack(TabId id)
+{
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        return existing->second->canGoBack();
+    }
+    return false;
+}
+bool TabManager::canGoForward(TabId id)
+{
+
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        return existing->second->canGoForward();
+    }
+    return false;
+}
+void TabManager::goBack(TabId id)
+{
+
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->goBack();
+    }
+}
+void TabManager::goForward(TabId id)
+{
+
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->goForward();
+    }
+}
+
+void TabManager::visitUrl(TabId id, Url url)
+{
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->visitUrl(url);
+    }
+}
