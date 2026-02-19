@@ -2,10 +2,12 @@
 
 TabId TabManager::createTab(Url url)
 {
-    auto tab = std::make_unique<Tab>(_idGenerator.create(), std::move(url));
-    _tabs.emplace(tab->getId(), tab);
+    TabId id = _idGenerator.create();
+    auto tab = std::make_unique<Tab>(id, std::move(url));
+    _tabs.emplace(id, std::move(tab));
 
-    _tabsOrder.push_back(tab->getId());
+    _tabsOrder.push_back(id);
+    return id;
 }
 
 void TabManager::closeTab(TabId id)
@@ -42,6 +44,7 @@ Tab *TabManager::getTab(TabId id)
     {
         return tabIt->second.get();
     }
+    return nullptr;
 }
 
 TabId TabManager::getActiveTabId()
@@ -116,5 +119,15 @@ void TabManager::visitUrl(TabId id, Url url)
     if (existing != _tabs.end())
     {
         existing->second->visitUrl(url);
+    }
+}
+
+
+void TabManager::changeTabUrl(TabId id, Url url)
+{
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->changeUrl(url);
     }
 }

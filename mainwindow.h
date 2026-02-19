@@ -21,15 +21,17 @@ public:
     ~MainWindow();
 public slots:
     void onSearchEditingFinished();
-    void onUrlChanged(QUrl newUrl);
+    void onEngineUrlChanged(QUrl newUrl);
+    void updateUrlBar(QUrl newUrl);
 private:
     void setupUI();
-    void onGoToWebsite(QString address);
+    void onUrlVisited(QString address);
     QWidget * _centralWidget;
     QLineEdit * _search;
     QWebEngineView * _page;
 
     std::unique_ptr<BrowserCore> _core;
     TabId _activeTabId;
+    std::vector<std::unique_ptr<ISubscription>> _subscriptions;
 };
 #endif // MAINWINDOW_H

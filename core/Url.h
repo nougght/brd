@@ -5,16 +5,21 @@
 class Url
 {
 private:
-    std::string _value;
 public:
-    explicit Url(std::string value) : _value(value)
+    std::string value;
+    explicit Url(std::string value_) : value(value_)
     {
     }
 
+    bool operator==(const Url& other) const
+    {
+        return value == other.value;
+    }
     std::string toStdString()
     {
-        return _value;
+        return value;
     }
+
 
 };
 #endif

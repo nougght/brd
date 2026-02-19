@@ -1,6 +1,7 @@
 #ifndef TAB_MANAGER_H
 #define TAB_MANAGER_H
 
+#include "Identifier.h"
 #include "Tab.h"
 #include "TabIdGenerator.h"
 #include <unordered_map>
@@ -33,6 +34,7 @@ public:
     void goForward(TabId id);
 
     void visitUrl(TabId id, Url url);
+    void changeTabUrl(TabId id, Url url);
 };
 
 #endif

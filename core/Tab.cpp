@@ -1,7 +1,7 @@
 #include "Tab.h"
 
 
-Tab::Tab(TabId id, Url url) : _id(id), _currentUrl(url)
+Tab::Tab(TabId id, Url url) : _id(id), _url(url)
 {
 }
 
@@ -22,8 +22,10 @@ bool Tab::canGoForward()
 
 void Tab::visitUrl(Url url)
 {
+    if(url == _url) return;
+
     _history.addUrl(url);
-    _currentUrl = _history.currentItem()->url;
+    _url = _history.currentItem()->url;
 }
 
 void Tab::goBack()
@@ -31,7 +33,7 @@ void Tab::goBack()
     if (_history.canGoBack())
     {
         _history.goBack();
-        _currentUrl = _history.currentItem()->url;
+        _url = _history.currentItem()->url;
     }
 }
 
@@ -40,12 +42,19 @@ void Tab::goForward()
     if (_history.canGoForward())
     {
         _history.goForward();
-        _currentUrl = _history.currentItem()->url;
+        _url = _history.currentItem()->url;
     }
 }
 
-void Tab::onTitleChanged(std::string &title)
+void Tab::changeTitle(std::string &title)
 {
-    _history.updateCurrentTitle(title);
+    _history.changeCurrentTitle(title);
     _title = title;
+}
+
+
+void Tab::changeUrl(Url url)
+{
+    _history.changeCurrentUrl(url);
+    _url = url;
 }

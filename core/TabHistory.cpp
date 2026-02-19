@@ -1,6 +1,6 @@
 #include "TabHistory.h"
 
-void TabHistory::addUrl(std::string newUrl)
+void TabHistory::addUrl(Url newUrl)
 {
     // если не на последнем элементе - очищаем последующие
     if (_currentIndex < _items.size() - 1)
@@ -43,10 +43,17 @@ bool TabHistory::canGoForward()
     return _currentIndex < _items.size() - 1;
 }
 
-void TabHistory::updateCurrentTitle(std::string newTitle)
+void TabHistory::changeCurrentTitle(std::string newTitle)
 {
     if (_currentIndex != -1)
     {
         _items[_currentIndex].title = newTitle;
+    }
+}
+void TabHistory::changeCurrentUrl(Url url)
+{
+    if (_currentIndex != -1)
+    {
+        _items[_currentIndex].url = url;
     }
 }
