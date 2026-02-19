@@ -6,6 +6,7 @@
 #include <memory>
 #include "TabManager.h"
 #include "Event.h"
+#include "EventTypes.h"
 
 class BrowserCore
 {
@@ -30,11 +31,13 @@ public:
     void goBack(TabId id);
     void goForward(TabId id);
 
+    void changeTabUrl(TabId id, Url url);
 
 
 
     // events
-    Event<std::string> goToWebsite;
+    Event<UrlVisitedArgs> urlVisited;
+    Event<UrlChangedArgs> urlChanged;
     
 };
 #endif

@@ -25,7 +25,8 @@ public:
     TabHistoryItem * currentItem();
     bool canGoBack();
     bool canGoForward();
-    void updateCurrentTitle(std::string title);
+    void changeCurrentTitle(std::string title);
+    void changeCurrentUrl(Url url);
 };
 
 #endif

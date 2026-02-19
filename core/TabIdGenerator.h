@@ -1,6 +1,6 @@
 #ifndef TAB_ID_GENERATOR_H
 #define TAB_ID_GENERATOR_H
-#include "TabId.h"
+#include "Identifier.h"
 
 // generator of unique auto increment tab ids
 class TabIdGenerator

@@ -1,15 +1,17 @@
 #ifndef TAB_H
 #define TAB_H
 
-#include "TabId.h"
+// #include "TabId.h"
+
 #include "TabHistory.h"
+#include "Identifier.h"
 
 // browser tab state with visit history
 class Tab {
 private:
     TabId _id;
     TabHistory _history;
-    Url _currentUrl;
+    Url _url;
     std::string _title;
     
 public:
@@ -21,6 +23,7 @@ public:
     void goBack();
     void goForward();
 
-    void onTitleChanged(std::string &title);
+    void changeTitle(std::string &title);
+    void changeUrl(Url url);
 };
 #endif
