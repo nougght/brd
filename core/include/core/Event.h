@@ -1,13 +1,14 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-// #include "HandlerId.h"
-#include "Identifier.h"
 #include <unordered_map>
 #include <functional>
 #include <string>
 #include <algorithm>
 #include <iostream>
+
+// #include "HandlerId.h"
+#include "Identifier.h"
 
 // template <typename T>
 // class Event;
@@ -188,6 +189,7 @@ inline void Event<T>::invoke(const T &data)
         hndl.second(data);
     }
 }
+
 
 inline Subscription<void> Event<void>::subscribe(Handler h)
 {

@@ -1,4 +1,4 @@
-#include "TabHistory.h"
+#include <core/TabHistory.h>
 
 void TabHistory::addUrl(Url newUrl)
 {

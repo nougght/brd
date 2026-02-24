@@ -1,8 +1,8 @@
 #ifndef TAB_MANAGER_H
 #define TAB_MANAGER_H
 
-#include "Identifier.h"
-#include "Tab.h"
+// #include <core/Identifier.h>
+#include <core/Tab.h>
 #include "TabIdGenerator.h"
 #include <unordered_map>
 #include <vector>
@@ -16,10 +16,13 @@ private:
     std::vector<TabId> _tabsOrder;
     TabIdGenerator _idGenerator;
     TabId _activeTabId;
+    Url _initialTabUrl = Url("https://google.com");
 
     std::pair<TabId, std::unique_ptr<Tab>> _findTab(TabId id);
 
 public:
+    TabManager();
+    TabId createTab();
     TabId createTab(Url url);
     void closeTab(TabId id);
     TabId getActiveTabId();
@@ -27,6 +30,8 @@ public:
     void moveTab(TabId id, int newIndex);
     Tab *getTab(TabId id);
     const std::vector<TabId> &getTabsOrder();
+    const std::vector<Tab> getTabs();
+    const std::vector<TabInfo> getTabInfos();
 
     bool canGoBack(TabId id);
     bool canGoForward(TabId id);
@@ -35,6 +40,10 @@ public:
 
     void visitUrl(TabId id, Url url);
     void changeTabUrl(TabId id, Url url);
+    void reloadTab(TabId id);
+
+
+    Event<TabInfo> tabCreated;
 };
 
 #endif

@@ -1,14 +1,29 @@
 #include "TabManager.h"
+#include <algorithm>
+#include <iterator>
 
-TabId TabManager::createTab(Url url)
+TabManager::TabManager()
+{
+    createTab();
+}
+
+TabId TabManager::createTab(Url url )
 {
     TabId id = _idGenerator.create();
     auto tab = std::make_unique<Tab>(id, std::move(url));
     _tabs.emplace(id, std::move(tab));
 
     _tabsOrder.push_back(id);
+    tabCreated.invoke(getTab(id)->toTabInfo());
     return id;
 }
+
+TabId TabManager::createTab()
+{
+    return createTab(_initialTabUrl);
+}
+
+
 
 void TabManager::closeTab(TabId id)
 {
@@ -75,6 +90,25 @@ const std::vector<TabId> &TabManager::getTabsOrder()
     return _tabsOrder;
 }
 
+const std::vector<Tab> TabManager::getTabs()
+{
+    // return std::vector<Tab>(_tabs.begin(), _tabs.end());
+    return {};
+}
+
+const std::vector<TabInfo> TabManager::getTabInfos()
+{
+    std::vector<TabInfo> result;
+    result.reserve(_tabs.size());
+    // конвертация map<tabId, tab> в vector<tabInfo>
+    std::transform(_tabs.begin(), _tabs.end(), std::back_inserter(result),  // back_inserter - для вставки в конец контейнера
+        [](const auto& pair) // передача без копирования
+            {
+                return pair.second->toTabInfo();
+            });
+    return result;
+}
+
 bool TabManager::canGoBack(TabId id)
 {
     auto existing = _tabs.find(id);
@@ -130,4 +164,9 @@ void TabManager::changeTabUrl(TabId id, Url url)
     {
         existing->second->changeUrl(url);
     }
+}
+
+void TabManager::reloadTab(TabId id)
+{
+
 }

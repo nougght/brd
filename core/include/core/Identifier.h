@@ -16,11 +16,13 @@ struct Identifier
     // {
     //     return value;
     // }
+    
     bool operator==(const Identifier &other) const
     {
         return value == other.value;
     }
-    bool isValid()
+
+    bool isValid() const
     {
         return !(value == 0);
     }

@@ -7,14 +7,9 @@ class Url
 private:
 public:
     std::string value;
-    explicit Url(std::string value_) : value(value_)
-    {
-    }
+    explicit Url(std::string value_);
+    bool operator==(const Url& other) const;
 
-    bool operator==(const Url& other) const
-    {
-        return value == other.value;
-    }
     std::string toStdString()
     {
         return value;
