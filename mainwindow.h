@@ -4,9 +4,10 @@
 #include <QMainWindow>
 #include <QLineEdit>
 #include <QWebEngineView>
+#include<QVBoxLayout>
 #include <memory>
 
-
+#include "tabbarwithcontrol.h"
 #include "core/BrowserCore.h"
 #include "core/Url.h"
 #include "core/TabId.h"
@@ -20,15 +21,21 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 public slots:
+    void onTabCreated(TabInfo tabInfo);
+    void onNavigationCompleted(NavigationCompletedArgs args);
     void onSearchEditingFinished();
     void onEngineUrlChanged(QUrl newUrl);
     void updateUrlBar(QUrl newUrl);
+    void onUrlVisited(QUrl url);
+
 private:
     void setupUI();
-    void onUrlVisited(QString address);
+    void setupEvents();
     QWidget * _centralWidget;
+    QVBoxLayout * _centralLayout;
     QLineEdit * _search;
     QWebEngineView * _page;
+    TabBarWithControl * _tabBar;
 
     std::unique_ptr<BrowserCore> _core;
     TabId _activeTabId;
