@@ -4,8 +4,19 @@
 
 TabManager::TabManager()
 {
-    createTab();
 }
+
+void TabManager::loadTabs()
+{
+    // createTab();
+    TabId id = _idGenerator.create();
+    auto tab = std::make_unique<Tab>(id, _initialTabUrl);
+    _tabs.emplace(id, std::move(tab));
+
+    _tabsOrder.push_back(id);
+    tabsLoaded.invoke(getTabInfos());
+}
+
 
 TabId TabManager::createTab(Url url )
 {
@@ -17,6 +28,7 @@ TabId TabManager::createTab(Url url )
     tabCreated.invoke(getTab(id)->toTabInfo());
     return id;
 }
+
 
 TabId TabManager::createTab()
 {
@@ -49,8 +61,32 @@ void TabManager::closeTab(TabId id)
         }
         _tabsOrder.erase(it);
         _tabs.erase(id);
+        tabClosed.invoke(id);
     }
 }
+
+void TabManager::changeActiveTab(TabId id)
+{
+    if (_tabs.find(id) != _tabs.end())
+    {
+        _activeTabId = id;
+        activeTabChanged.invoke(id);
+    }
+}
+
+
+void TabManager::moveTab(TabId id, int newIndex)
+{
+    auto it = std::find(_tabsOrder.begin(), _tabsOrder.end(), id);
+    if (it != _tabsOrder.end())
+    {
+        int oldIndex = it - _tabsOrder.begin();
+        _tabsOrder.erase(it);
+        _tabsOrder.insert(_tabsOrder.begin() + newIndex, id);
+        tabMoved.invoke(TabMovedArgs{id, oldIndex, newIndex});
+    }
+}
+
 
 Tab *TabManager::getTab(TabId id)
 {
@@ -67,23 +103,7 @@ TabId TabManager::getActiveTabId()
     return _activeTabId;
 }
 
-void TabManager::changeActiveTab(TabId id)
-{
-    if (_tabs.find(id) != _tabs.end())
-    {
-        _activeTabId = id;
-    }
-}
 
-void TabManager::moveTab(TabId id, int newIndex)
-{
-    auto it = std::find(_tabsOrder.begin(), _tabsOrder.end(), id);
-    if (it != _tabsOrder.end())
-    {
-        _tabsOrder.erase(it);
-        _tabsOrder.insert(_tabsOrder.begin() + newIndex, id);
-    }
-}
 
 const std::vector<TabId> &TabManager::getTabsOrder()
 {

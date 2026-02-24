@@ -64,6 +64,7 @@ public:
     
     void loadTabs();
     void createTab(Url url);
+    void createTab();
     void closeTab(TabId id);
     void changeActiveTab(TabId id);
     void moveTab(TabId id, int newIndex);

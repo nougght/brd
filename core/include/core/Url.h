@@ -10,7 +10,7 @@ public:
     explicit Url(std::string value_);
     bool operator==(const Url& other) const;
 
-    std::string toStdString()
+    std::string toStdString() const
     {
         return value;
     }

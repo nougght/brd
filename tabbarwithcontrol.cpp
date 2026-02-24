@@ -11,6 +11,7 @@ TabBarWithControl::TabBarWithControl(QWidget *parent) : QFrame(parent)
 
 void TabBarWithControl::setupUI()
 {
+    this->setObjectName("tabBar");
     _layout = new QHBoxLayout(this);
     _layout->setSpacing(0);
     _layout->setContentsMargins(0, 0, 0, 0);
@@ -23,18 +24,36 @@ void TabBarWithControl::setupUI()
     _tabsList->setWrapping(false);
     _tabsList->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     _tabsList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    connect(_tabsList, &QListView::clicked, this, &TabBarWithControl::onTabClicked);
 
-    TabsModel *model = new TabsModel();
-    model->addItem("один");
-    model->addItem("два");
-    _tabsList->setModel(model);
-    _layout->addWidget(_tabsList);
+    _tabsModel = new TabsModel(this);
+    // for (int i = 0; i < 6; ++i)
+    // {
+    //     model->addTab("вкладка " + QString::number(i));
+    // }
+    _tabsList->setModel(_tabsModel);
+    _tabsList->setItemAlignment(Qt::AlignmentFlag::AlignCenter);
+    _tabsList->setFlow(QListView::Flow::LeftToRight);
+    _tabsList->setWrapping(false);
+
+    _tabsList->setSelectionRectVisible(true);
+    // политика высоты - ignored, чтобы список не растягивал layout
+    _tabsList->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
+
+
+    // _tabsList->setMaximumHeight(35);
+    qDebug() << "\n TAB LIST SIZE = " << _tabsList->size();
+    _layout->addWidget(_tabsList, Qt::AlignmentFlag::AlignLeft);
+
     auto spacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Fixed);
     _layout->addItem(spacer);
 
     _controlPanel = new QFrame();
     auto _controlLayout = new QHBoxLayout(_controlPanel);
 
+    _addNewTabButton = new QPushButton("➕");
+    _addNewTabButton->setObjectName("newTabButton");
+    connect(_addNewTabButton, &QPushButton::clicked, this, [this]{emit this->newTabClicked();});
 
     _minimiseButton = new QPushButton("—");
     _minimiseButton->setObjectName("minimiseButton");
@@ -46,8 +65,41 @@ void TabBarWithControl::setupUI()
 
     _controlLayout->setContentsMargins(0, 0, 0, 0);
     _controlLayout->setSpacing(0);
+    _controlLayout->addWidget(_addNewTabButton);
     _controlLayout->addWidget(_minimiseButton);
     _controlLayout->addWidget(_closeButton);
     _layout->addWidget(_controlPanel);
     qDebug() << _layout->count();
+}
+
+void TabBarWithControl::onTabClicked(const QModelIndex &index)
+{
+    TabId id = _tabsModel->getTabIdByIndex(index.row());
+    emit tabClicked(id);
+}
+void TabBarWithControl::addTab(const TabInfo &tab)
+{
+    _tabsModel->addTab(tab);
+}
+
+void TabBarWithControl::updateTabTitle(TabId id, std::string title)
+{
+    _tabsModel->updateTabTitle(id, title);
+}
+void TabBarWithControl::updateTabUrl(TabId id, Url url)
+{
+    _tabsModel->updateTabUrl(id, url);
+}
+void TabBarWithControl::updateTabLoading(TabId id, bool isLoading)
+{
+    _tabsModel->updateTabLoading(id, isLoading);
+}
+void TabBarWithControl::updateTabNavigation(TabId id, bool canGoBack, bool canGoForward)
+{
+    _tabsModel->updateTabNavigation(id, canGoBack, canGoForward);
+}
+
+void TabBarWithControl::setInitialTabs(std::vector<TabInfo> tabs)
+{
+    _tabsModel->setInitialTabs(tabs);
 }

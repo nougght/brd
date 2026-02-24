@@ -8,6 +8,29 @@
     background-color: transparent;
 }
 
+#newTabButton{
+    font-size: 15px;
+    border: none;
+    text-align:center;
+    padding: 5 10px;
+    margin: 0px;
+
+    background-color: transparent;
+}
+
+QMainWindow
+{
+    background-color: grey;
+}
+
+#tabBar
+{
+    background-color: blue;
+}
+QListView
+{
+    background-color: #b32323;
+}
 #minimiseButton:hover {
     background-color: #00000038;
 }
@@ -16,3 +39,4 @@
     background-color: #b32323;
     
 }
+

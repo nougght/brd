@@ -2,6 +2,8 @@
 #define MODELS_H
 
 #include "types.h"
+#include "Identifier.h"
+#include "Url.h"
 #include <string>
 
 struct TabInfo {

@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QListWidget>
+#include "tabsmodel.h"
 
 class TabBarWithControl : public QFrame
 {
@@ -12,13 +13,29 @@ class TabBarWithControl : public QFrame
 public:
     TabBarWithControl(QWidget *parent);
     void setupUI();
+    void addTab(const TabInfo &tab);
+    void updateTabTitle(TabId id, std::string title);
+    void updateTabUrl(TabId id, Url url);
+    void updateTabLoading(TabId id, bool isLoading);
+    void updateTabNavigation(TabId id, bool canGoBack, bool canGoForward);
+
+    void setInitialTabs(std::vector<TabInfo> tabs);
+
+
 signals:
     void closeClicked();
     void minimiseClicked();
+    void newTabClicked();
+    void tabClicked(TabId id);
 private:
+
+    void onTabClicked(const QModelIndex &index);
+    TabsModel * _tabsModel;
+
     QHBoxLayout *_layout;
     QListView *_tabsList;
     QFrame *_controlPanel;
+    QPushButton *_addNewTabButton;
     QPushButton *_minimiseButton;
     QPushButton *_closeButton;
 };

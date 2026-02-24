@@ -4,10 +4,15 @@
 #include <QMainWindow>
 #include <QLineEdit>
 #include <QWebEngineView>
-#include<QVBoxLayout>
+#include <QVBoxLayout>
+#include <QStackedWidget>
+
 #include <memory>
+#include <map>
 
 #include "tabbarwithcontrol.h"
+#include "tabsmodel.h"
+
 #include "core/BrowserCore.h"
 #include "core/Url.h"
 #include "core/TabId.h"
@@ -21,12 +26,18 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 public slots:
+    void onTabsLoaded(std::vector<TabInfo>);
     void onTabCreated(TabInfo tabInfo);
     void onNavigationCompleted(NavigationCompletedArgs args);
     void onSearchEditingFinished();
-    void onEngineUrlChanged(QUrl newUrl);
+    void onEngineUrlChanged(TabId id, QUrl newUrl);
     void updateUrlBar(QUrl newUrl);
-    void onUrlVisited(QUrl url);
+    void onUrlVisited(Url url);
+
+    void onActiveTabChanged(TabId id);
+
+    void onNewTabClicked();
+    void onTabClicked(TabId id);
 
 private:
     void setupUI();
@@ -34,11 +45,13 @@ private:
     QWidget * _centralWidget;
     QVBoxLayout * _centralLayout;
     QLineEdit * _search;
-    QWebEngineView * _page;
     TabBarWithControl * _tabBar;
+    QStackedWidget * _stackedWidget;
+
 
     std::unique_ptr<BrowserCore> _core;
     TabId _activeTabId;
     std::vector<std::unique_ptr<ISubscription>> _subscriptions;
+    std::map<TabId, QWebEngineView*> _tabWidgets;
 };
 #endif // MAINWINDOW_H

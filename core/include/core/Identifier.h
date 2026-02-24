@@ -17,10 +17,39 @@ struct Identifier
     //     return value;
     // }
     
-    bool operator==(const Identifier &other) const
+    bool equal(const Identifier &other) const
     {
         return value == other.value;
     }
+    bool greater(const Identifier &other) const
+    {
+        return value > other.value;
+    }
+    bool less(const Identifier &other) const
+    {
+        return value < other.value;
+    }
+
+    bool operator==(const Identifier &other) const
+    {
+        return equal(other);
+    }
+
+    bool operator!=(const Identifier &other) const
+    {
+        return !equal(other);
+    }
+
+    bool operator>(const Identifier &other) const
+    {
+        return greater(other);
+    }
+
+    bool operator<(const Identifier &other) const
+    {
+        return less(other);
+    }
+
 
     bool isValid() const
     {

@@ -22,6 +22,8 @@ private:
 
 public:
     TabManager();
+    void loadTabs();
+
     TabId createTab();
     TabId createTab(Url url);
     void closeTab(TabId id);
@@ -43,7 +45,25 @@ public:
     void reloadTab(TabId id);
 
 
+    Event<std::vector<TabInfo>> tabsLoaded;
+
+    // создана новая вкладка
     Event<TabInfo> tabCreated;
+
+    // переходы в рамках одной вкладки
+    Event<NavigationCompletedArgs> navigationCompleted;
+
+    // вкладка перемещена
+    Event<TabMovedArgs> tabMoved;
+
+    // вкладка закрыта
+    Event<TabId> tabClosed;
+
+    // новая активная вкладка
+    Event<TabId> activeTabChanged;
+
+    // все вкладки закрыты
+    Event<void> lastTabClosed;
 };
 
 #endif

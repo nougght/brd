@@ -2,13 +2,37 @@
 #include "services/tabs/TabManager.h"
 
 
-BrowserCore::BrowserCore() :  _eventLoopWorker([this] {_run(); })
+BrowserCore::BrowserCore() :  _tabManager(std::make_unique<TabManager>()), _eventLoopWorker([this] {_run(); })
 {
-    _subs.push_back(std::make_unique<Subscription<TabInfo>>(_tabManager->tabCreated.subscribe([this](TabInfo tabInfo)
-          {
-              this->tabCreated.invoke(tabInfo);
-          })));
-    _tabManager = std::make_unique<TabManager>();
+    _post([this]
+    {
+        _subs.push_back(std::make_unique<Subscription<TabInfo>>(_tabManager->tabCreated.subscribe([this](TabInfo tabInfo)
+              {
+                  this->tabCreated.invoke(tabInfo);
+              })));
+
+    });
+
+    _post([this]()
+          { _subs.push_back(std::make_unique<Subscription<std::vector<TabInfo>>>(_tabManager->tabsLoaded.subscribe(
+                [this] (std::vector<TabInfo> tabs) {
+                    tabsLoaded.invoke(tabs); })));
+    });
+
+
+    _post([this]()
+          { _subs.push_back(std::make_unique<Subscription<TabId>>(_tabManager->activeTabChanged.subscribe(
+                [this] (TabId id) {
+                    activeTabChanged.invoke(id);})));
+    });
+
+    _post([this]()
+          { _subs.push_back(std::make_unique<Subscription<TabId>>(_tabManager->tabClosed.subscribe(
+                [this] (TabId id) {
+                    tabClosed.invoke(id); })));
+    });
+
+
 }
 
 BrowserCore::~BrowserCore()
@@ -69,8 +93,12 @@ void BrowserCore::_post(std::function<void()> task)
 
 void BrowserCore::loadTabs()
 {
-    _post([this]()
-          { tabsLoaded.invoke(_tabManager->getTabInfos()); });
+    _post([this]{
+        _tabManager->loadTabs();
+    });
+
+    // _post([this]()
+    //       { tabsLoaded.invoke(_tabManager->getTabInfos()); });
 }
 
 void BrowserCore::createTab(Url url)
@@ -82,6 +110,14 @@ void BrowserCore::createTab(Url url)
               // tabCreated.invoke(tabInfo);
               // navigationCompleted.invoke(NavigationCompletedArgs{NavigationType::NewPage, tabInfo});
           });
+}
+
+void BrowserCore::createTab()
+{
+    _post([this]
+          {
+        _tabManager->createTab();
+    });
 }
 
 void BrowserCore::closeTab(TabId id)
@@ -122,6 +158,18 @@ void BrowserCore::changeTabUrl(TabId id, Url url)
 }
 
 
+void BrowserCore::changeActiveTab(TabId id)
+{
+    _post([this, id] {
+        if (!id.isValid())
+            return;
+        _tabManager->changeActiveTab(id);
+    });
+}
+
+
+
+
 
 
 void BrowserCore::reloadTab(TabId id)
@@ -148,12 +196,8 @@ void BrowserCore::goForward(TabId id)
 }
 
 
-void BrowserCore::changeActiveTab(TabId id)
-{
-    if (!id.isValid())
-        return;
-    _tabManager->changeActiveTab(id);
-}
+
+
 void BrowserCore::moveTab(TabId id, int newIndex)
 {
     if (!id.isValid())
