@@ -22,6 +22,30 @@ struct TabMovedArgs
     int toIndex;
 };
 
+struct TabTitleChangedArgs
+{
+    TabId id;
+    std::string newTitle;
+};
+
+struct TabIconChangedArgs
+{
+    //
+};
+
+
+struct TabLoadingStatusChangedArgs
+{
+    TabId id;
+    bool isLoading;
+};
+
+struct TabLoadingProgressChangedArgs
+{
+    TabId id;
+    int progress;
+};
+
 
 
 #endif

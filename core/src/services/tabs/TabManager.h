@@ -16,6 +16,7 @@ private:
     std::vector<TabId> _tabsOrder;
     TabIdGenerator _idGenerator;
     TabId _activeTabId;
+    //
     Url _initialTabUrl = Url("https://google.com");
 
     std::pair<TabId, std::unique_ptr<Tab>> _findTab(TabId id);
@@ -42,6 +43,9 @@ public:
 
     void visitUrl(TabId id, Url url);
     void changeTabUrl(TabId id, Url url);
+    void changeTabTitle(TabId id, std::string title);
+    void changeTabLoadingProgress(TabId id, int progress);
+    void setTabLoadingStatus(TabId id, bool isLoading);
     void reloadTab(TabId id);
 
 
@@ -52,6 +56,15 @@ public:
 
     // переходы в рамках одной вкладки
     Event<NavigationCompletedArgs> navigationCompleted;
+
+    Event<TabTitleChangedArgs> titleChanged;
+
+    Event<TabLoadingProgressChangedArgs> loadingProgressChanged;
+
+    Event<TabIconChangedArgs> iconChanged;
+
+    Event<TabLoadingStatusChangedArgs> loadingStatusChanged;
+
 
     // вкладка перемещена
     Event<TabMovedArgs> tabMoved;
@@ -64,6 +77,8 @@ public:
 
     // все вкладки закрыты
     Event<void> lastTabClosed;
+
+    Event<TabId> tabReloaded;
 };
 
 #endif

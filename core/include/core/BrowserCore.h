@@ -72,6 +72,10 @@ public:
     void goBack(TabId id);
     void visitUrl(TabId id, Url url);
     void changeTabUrl(TabId id, Url url);
+    void changeTabTitle(TabId id, std::string title);
+    void changeTabLoadingProgress(TabId id, int progress);
+    void setTabLoadingStatus(TabId id, bool isLoading);
+
     void reloadTab(TabId id);
 
 
@@ -98,6 +102,14 @@ public:
     // переходы в рамках одной вкладки
     Event<NavigationCompletedArgs> navigationCompleted;
 
+    Event<TabTitleChangedArgs> titleChanged;
+
+    Event<TabLoadingProgressChangedArgs> loadingProgessChanged;
+
+    Event<TabIconChangedArgs> iconChanged;
+
+    Event<TabLoadingStatusChangedArgs> loadingStatusChanged;
+
     // вкладка перемещена
     Event<TabMovedArgs> tabMoved;
 
@@ -109,6 +121,10 @@ public:
 
     // все вкладки закрыты
     Event<void> lastTabClosed;
+
+
+    // перезагрузка вкладки
+    Event<TabId> tabReloaded;
 
      
 };

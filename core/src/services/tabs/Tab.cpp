@@ -1,6 +1,6 @@
 #include <core/Tab.h>
 
-Tab::Tab(TabId id, Url url) : _id(id), _url(url)
+Tab::Tab(TabId id, Url url) : _id(id), _url(url), _isLoading(false), _loadingProgress(0)
 {
 }
 
@@ -48,11 +48,23 @@ void Tab::visitUrl(Url url)
     _url = _history.currentItem()->url;
 }
 
-void Tab::setLoading(bool isLoading)
+void Tab::setLoadingStatus(bool isLoading)
 {
+    // если загрузка началась или закончилась - обнуляем прогресс
+    if (_isLoading != isLoading)
+    {
+        _loadingProgress = 0;
+    }
     _isLoading = isLoading;
-    loadingChanged.invoke(_isLoading);
+    // loadingChanged.invoke(_isLoading);
 }
+
+void Tab::changeLoadingProgress(int progress)
+{
+    _loadingProgress = progress;
+}
+
+
 
 void Tab::goBack()
 {

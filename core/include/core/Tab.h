@@ -19,6 +19,7 @@ private:
     Url _url;
     std::string _title;
     bool _isLoading;
+    int _loadingProgress;
 
 public:
     Tab(TabId id, Url url);
@@ -26,11 +27,11 @@ public:
     Url getUrl();
     std::string getTitle();
     bool isLoading();
+    int getLoadingProgress();
 
     TabInfo toTabInfo();
 
     void visitUrl(Url url);
-    void setLoading(bool isLoading);
     bool canGoBack();
     bool canGoForward();
     void goBack();
@@ -38,6 +39,8 @@ public:
 
     void changeTitle(std::string &title);
     void changeUrl(Url url);
+    void changeLoadingProgress(int progress);
+    void setLoadingStatus(bool isLoading);
 
     // Event<bool> canGoBackChanged;
     // Event<bool> canGoForwardChanged;

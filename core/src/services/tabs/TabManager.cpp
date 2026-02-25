@@ -75,6 +75,64 @@ void TabManager::changeActiveTab(TabId id)
 }
 
 
+void TabManager::reloadTab(TabId id)
+{
+    tabReloaded.invoke(id);
+}
+
+
+void TabManager::visitUrl(TabId id, Url url)
+{
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->visitUrl(url);
+    }
+}
+
+
+void TabManager::changeTabUrl(TabId id, Url url)
+{
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->changeUrl(url);
+    }
+}
+
+
+void TabManager::changeTabTitle(TabId id, std::string title)
+{
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->changeTitle(title);
+        titleChanged.invoke(TabTitleChangedArgs{id, title});
+    }
+}
+
+void TabManager::changeTabLoadingProgress(TabId id, int progress)
+{
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->changeLoadingProgress(progress);
+        loadingProgressChanged.invoke(TabLoadingProgressChangedArgs{id, progress});
+    }
+}
+
+void TabManager::setTabLoadingStatus(TabId id, bool isLoading)
+{
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->setLoadingStatus(isLoading);
+        loadingStatusChanged.invoke(TabLoadingStatusChangedArgs{id, isLoading});
+    }
+}
+
+
+
 void TabManager::moveTab(TabId id, int newIndex)
 {
     auto it = std::find(_tabsOrder.begin(), _tabsOrder.end(), id);
@@ -167,26 +225,3 @@ void TabManager::goForward(TabId id)
     }
 }
 
-void TabManager::visitUrl(TabId id, Url url)
-{
-    auto existing = _tabs.find(id);
-    if (existing != _tabs.end())
-    {
-        existing->second->visitUrl(url);
-    }
-}
-
-
-void TabManager::changeTabUrl(TabId id, Url url)
-{
-    auto existing = _tabs.find(id);
-    if (existing != _tabs.end())
-    {
-        existing->second->changeUrl(url);
-    }
-}
-
-void TabManager::reloadTab(TabId id)
-{
-
-}

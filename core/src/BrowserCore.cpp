@@ -6,32 +6,48 @@ BrowserCore::BrowserCore() :  _tabManager(std::make_unique<TabManager>()), _even
 {
     _post([this]
     {
-        _subs.push_back(std::make_unique<Subscription<TabInfo>>(_tabManager->tabCreated.subscribe([this](TabInfo tabInfo)
-              {
-                  this->tabCreated.invoke(tabInfo);
+          _subs.push_back(std::make_unique<Subscription<TabInfo>>(_tabManager->tabCreated.subscribe([this](TabInfo tabInfo)
+                {
+                    this->tabCreated.invoke(tabInfo);
+                })));
+
+          _subs.push_back(std::make_unique<Subscription<std::vector<TabInfo>>>(_tabManager->tabsLoaded.subscribe(
+              [this] (std::vector<TabInfo> tabs) {
+                  tabsLoaded.invoke(tabs); })));
+
+
+          _subs.push_back(std::make_unique<Subscription<TabId>>(_tabManager->activeTabChanged.subscribe(
+              [this] (TabId id) {
+                  activeTabChanged.invoke(id);})));
+
+
+          _subs.push_back(std::make_unique<Subscription<TabId>>(_tabManager->tabClosed.subscribe(
+              [this] (TabId id) {
+                  tabClosed.invoke(id); })));
+
+
+          _subs.push_back(std::make_unique<Subscription<TabId>>(_tabManager->tabReloaded.subscribe(
+              [this] (TabId id) {
+                  navigationCompleted.invoke(NavigationCompletedArgs{
+                      NavigationType::Reload,
+                      _tabManager->getTab(id)->toTabInfo()
+                  });
               })));
 
+
+          _subs.push_back(std::make_unique<Subscription<TabTitleChangedArgs>>(_tabManager->titleChanged.subscribe(
+              [this] (TabTitleChangedArgs args) {
+                  titleChanged.invoke(args);})));
+          _subs.push_back(std::make_unique<Subscription<TabLoadingProgressChangedArgs>>(_tabManager->loadingProgressChanged.subscribe(
+              [this] (TabLoadingProgressChangedArgs args) {
+                  loadingProgessChanged.invoke(args);})));
+          _subs.push_back(std::make_unique<Subscription<TabLoadingStatusChangedArgs>>(_tabManager->loadingStatusChanged.subscribe(
+              [this] (TabLoadingStatusChangedArgs args) {
+                  loadingStatusChanged.invoke(args);})));
+          _subs.push_back(std::make_unique<Subscription<TabIconChangedArgs>>(_tabManager->iconChanged.subscribe(
+              [this] (TabIconChangedArgs args) {
+                  iconChanged.invoke(args);})));
     });
-
-    _post([this]()
-          { _subs.push_back(std::make_unique<Subscription<std::vector<TabInfo>>>(_tabManager->tabsLoaded.subscribe(
-                [this] (std::vector<TabInfo> tabs) {
-                    tabsLoaded.invoke(tabs); })));
-    });
-
-
-    _post([this]()
-          { _subs.push_back(std::make_unique<Subscription<TabId>>(_tabManager->activeTabChanged.subscribe(
-                [this] (TabId id) {
-                    activeTabChanged.invoke(id);})));
-    });
-
-    _post([this]()
-          { _subs.push_back(std::make_unique<Subscription<TabId>>(_tabManager->tabClosed.subscribe(
-                [this] (TabId id) {
-                    tabClosed.invoke(id); })));
-    });
-
 
 }
 
@@ -158,6 +174,37 @@ void BrowserCore::changeTabUrl(TabId id, Url url)
 }
 
 
+void BrowserCore::changeTabTitle(TabId id, std::string title)
+{
+    _post([this, id, title]
+          {
+              if (!id.isValid())
+                  return;
+              _tabManager->changeTabTitle(id, title);
+          });
+}
+
+void BrowserCore::setTabLoadingStatus(TabId id, bool isLoading)
+{
+    _post([this, id, isLoading]
+          {
+              if (!id.isValid())
+                  return;
+              _tabManager->setTabLoadingStatus(id, isLoading);
+          });
+}
+
+void BrowserCore::changeTabLoadingProgress(TabId id, int progress)
+{
+    _post([this, id, progress]
+          {
+              if (!id.isValid())
+                  return;
+              _tabManager->changeTabLoadingProgress(id, progress);
+          });
+}
+
+
 void BrowserCore::changeActiveTab(TabId id)
 {
     _post([this, id] {
@@ -167,20 +214,17 @@ void BrowserCore::changeActiveTab(TabId id)
     });
 }
 
-
-
-
-
-
 void BrowserCore::reloadTab(TabId id)
 {
-    if (!id.isValid())
-        return;
-    _tabManager->reloadTab(id);
-    navigationCompleted.invoke(NavigationCompletedArgs{
-                                                       NavigationType::Reload,
-                                                       _tabManager->getTab(id)->toTabInfo()});
+    _post([this, id]{
+        if (!id.isValid())
+            return;
+        _tabManager->reloadTab(id);
+    });
 }
+
+
+
 
 void BrowserCore::goBack(TabId id)
 {
