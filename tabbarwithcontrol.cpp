@@ -4,6 +4,7 @@
 #include <QSizePolicy>
 #include "tabsmodel.h"
 
+
 TabBarWithControl::TabBarWithControl(QWidget *parent) : QFrame(parent)
 {
     setupUI();
@@ -35,6 +36,10 @@ void TabBarWithControl::setupUI()
     _tabsList->setItemAlignment(Qt::AlignmentFlag::AlignCenter);
     _tabsList->setFlow(QListView::Flow::LeftToRight);
     _tabsList->setWrapping(false);
+    // _tabsList->setUniformItemSizes(true);
+    _tabsList->setWordWrap(false);
+    _tabsList->setItemDelegate(new ItemDelegate());
+
 
     _tabsList->setSelectionRectVisible(true);
     // политика высоты - ignored, чтобы список не растягивал layout
@@ -49,6 +54,7 @@ void TabBarWithControl::setupUI()
     _layout->addItem(spacer);
 
     _controlPanel = new QFrame();
+    _controlPanel->setObjectName("controlPanel");
     auto _controlLayout = new QHBoxLayout(_controlPanel);
 
     _addNewTabButton = new QPushButton("➕");
@@ -65,9 +71,10 @@ void TabBarWithControl::setupUI()
 
     _controlLayout->setContentsMargins(0, 0, 0, 0);
     _controlLayout->setSpacing(0);
-    _controlLayout->addWidget(_addNewTabButton);
+    _controlLayout->addWidget(_addNewTabButton, Qt::AlignmentFlag::AlignVCenter);
+    _controlLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Fixed));
     _controlLayout->addWidget(_minimiseButton);
-    _controlLayout->addWidget(_closeButton);
+    _controlLayout->addWidget(_closeButton);;
     _layout->addWidget(_controlPanel);
     qDebug() << _layout->count();
 }

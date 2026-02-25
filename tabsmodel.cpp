@@ -15,7 +15,8 @@ QVariant TabsModel::data(const QModelIndex &index, int role) const
     const auto& tab = _tabs[index.row()];
 
     if (role == Qt::DisplayRole)
-        return "-" + QString::number(tab.id.value) + "-";
+        return QString::fromStdString(tab.title);
+        // return "-" + QString::number(tab.id.value) + "-";
     if (role == Roles::UrlRole)
         return QString::fromStdString(tab.url.toStdString());
     if (role == Roles::BackNavigatingRole)

@@ -6,6 +6,7 @@
 #include <QWebEngineView>
 #include <QVBoxLayout>
 #include <QStackedWidget>
+#include <QProgressBar>
 
 #include <memory>
 #include <map>
@@ -31,21 +32,35 @@ public slots:
     void onNavigationCompleted(NavigationCompletedArgs args);
     void onSearchEditingFinished();
     void onEngineUrlChanged(TabId id, QUrl newUrl);
+    void onEngineTitleChanged(TabId id, QString newTitle);
+    void onLoadingStatusChanged(TabId id, bool isLoading);
+    void onLoadingProgressChanged(TabId id, int progress);
+
+    void setLoadingBarVisible(bool isVisible);
     void updateUrlBar(QUrl newUrl);
+    void updateTabTitle(TabId id, std::string title);
+    void reloadTab(TabId id);
     void onUrlVisited(Url url);
 
     void onActiveTabChanged(TabId id);
 
     void onNewTabClicked();
     void onTabClicked(TabId id);
+    void onReloadClicked();
 
 private:
     void setupUI();
     void setupEvents();
+    void setupTabViewEvents(TabId tabId, QWebEngineView *tabView);
+
     QWidget * _centralWidget;
     QVBoxLayout * _centralLayout;
+    QHBoxLayout * _searchBarLayout;
     QLineEdit * _search;
+    QPushButton * _reloadButton;
     TabBarWithControl * _tabBar;
+    QProgressBar * _loadingBar;
+    QWidget * _prgsBarPlaceholder;
     QStackedWidget * _stackedWidget;
 
 

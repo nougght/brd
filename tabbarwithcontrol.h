@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QListWidget>
+#include <QStyledItemDelegate>
 #include "tabsmodel.h"
 
 class TabBarWithControl : public QFrame
@@ -28,6 +29,15 @@ signals:
     void newTabClicked();
     void tabClicked(TabId id);
 private:
+
+    class ItemDelegate : public QStyledItemDelegate
+    {
+        QSize sizeHint(const QStyleOptionViewItem &option,
+                       const QModelIndex &index) const override
+        {
+            return QSize(100, 30);
+        }
+    };
 
     void onTabClicked(const QModelIndex &index);
     TabsModel * _tabsModel;
