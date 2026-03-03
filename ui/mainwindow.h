@@ -19,6 +19,9 @@
 #include "core/TabId.h"
 #include "core/Event.h"
 
+
+// to do: выделить контроллер из виджета и оставить только ui
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -40,24 +43,35 @@ public slots:
     void updateUrlBar(QUrl newUrl);
     void updateTabTitle(TabId id, std::string title);
     void reloadTab(TabId id);
-    void onUrlVisited(Url url);
+    void navigateBack(TabInfo tabInfo);
+    void navigateForward(TabInfo tabInfo);
+    void onUrlVisited(TabInfo tab);
+    void onTabsModelDataChanged(const QModelIndex &topLeft,
+                                const QModelIndex &bottomRight,
+                                const QList<int> &roles = QList<int>());
 
     void onActiveTabChanged(TabId id);
 
     void onNewTabClicked();
     void onTabClicked(TabId id);
     void onReloadClicked();
+    void onBackClicked();
+    void onForwardClicked();
 
 private:
     void setupUI();
     void setupEvents();
     void setupTabViewEvents(TabId tabId, QWebEngineView *tabView);
 
+    TabsModel *_tabsModel;
+
     QWidget * _centralWidget;
     QVBoxLayout * _centralLayout;
     QHBoxLayout * _searchBarLayout;
     QLineEdit * _search;
     QPushButton * _reloadButton;
+    QPushButton * _backButton;
+    QPushButton * _forwardButton;
     TabBarWithControl * _tabBar;
     QProgressBar * _loadingBar;
     QWidget * _prgsBarPlaceholder;
@@ -66,7 +80,6 @@ private:
 
     std::unique_ptr<BrowserCore> _core;
     TabId _activeTabId;
-    std::vector<std::unique_ptr<ISubscription>> _subscriptions;
     std::map<TabId, QWebEngineView*> _tabWidgets;
 };
 #endif // MAINWINDOW_H

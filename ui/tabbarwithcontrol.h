@@ -12,7 +12,7 @@ class TabBarWithControl : public QFrame
 {
     Q_OBJECT
 public:
-    TabBarWithControl(QWidget *parent);
+    TabBarWithControl(QWidget *parent, TabsModel * model);
     void setupUI();
     void addTab(const TabInfo &tab);
     void updateTabTitle(TabId id, std::string title);

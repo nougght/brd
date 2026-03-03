@@ -15,6 +15,7 @@ QUrl convert(Url url)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    _tabsModel = new TabsModel(this);
     setupUI();
     _core = std::make_unique<BrowserCore>();
     setupEvents();
@@ -33,20 +34,33 @@ void MainWindow::setupUI()
     // _centralLayout->
     _centralLayout->setContentsMargins(0,0,0,0);
     this->setCentralWidget(_centralWidget);
-    _tabBar = new TabBarWithControl(_centralWidget);
+    _tabBar = new TabBarWithControl(_centralWidget, _tabsModel);
 
     _searchBarLayout = new QHBoxLayout();
     _searchBarLayout->setContentsMargins(0,0,0,0);
     _searchBarLayout->setSpacing(0);
 
+
+    _backButton = new QPushButton("🠔", _centralWidget);
+    _backButton->setObjectName("backButton");
+    _backButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+
+    _forwardButton = new QPushButton("🠖", _centralWidget);
+    _forwardButton->setObjectName("forwardButton");
+    _forwardButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
     _reloadButton = new QPushButton("⟳", _centralWidget);
     _reloadButton->setObjectName("reloadButton");
     _reloadButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
 
     _search = new QLineEdit(_centralWidget);
     _search->setObjectName("searchBar");
     _search->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
+    _searchBarLayout->addWidget(_backButton,  Qt::AlignmentFlag::AlignVCenter | Qt::AlignLeft);
+    _searchBarLayout->addWidget(_forwardButton,  Qt::AlignmentFlag::AlignVCenter | Qt::AlignLeft);
     _searchBarLayout->addWidget(_reloadButton, Qt::AlignmentFlag::AlignVCenter | Qt::AlignLeft);
     _searchBarLayout->addWidget(_search);
 
@@ -151,7 +165,10 @@ void MainWindow::setupEvents()
     connect(_tabBar, &TabBarWithControl::closeClicked, this, &MainWindow::close);
 
     connect(_reloadButton, &QPushButton::clicked, this, &MainWindow::onReloadClicked);
+    connect(_backButton, &QPushButton::clicked, this, &MainWindow::onBackClicked);
+    connect(_forwardButton, &QPushButton::clicked, this, &MainWindow::onForwardClicked);
 
+    connect(_tabsModel, &QAbstractItemModel::dataChanged, this, &MainWindow::onTabsModelDataChanged);
 }
 
 
@@ -172,6 +189,15 @@ void MainWindow::onReloadClicked()
     _core->reloadTab(_activeTabId);
 }
 
+void MainWindow::onBackClicked()
+{
+    _core->goBack(_activeTabId);
+}
+
+void MainWindow::onForwardClicked()
+{
+    _core->goForward(_activeTabId);
+}
 
 void MainWindow::onLoadingStatusChanged(TabId id, bool isLoading)
 {
@@ -202,13 +228,17 @@ void MainWindow::onNavigationCompleted(NavigationCompletedArgs args)
     switch(args.type)
     {
     case NavigationType::NewPage:
-        onUrlVisited(args.tabInfo.url);
+        onUrlVisited(args.tabInfo);
         break;
-    case NavigationType::BackForward:
-        // onUrlVisited(convert(args.tabInfo.url));
+    case NavigationType::Back:
+        navigateBack(args.tabInfo);
+        break;
+    case NavigationType::Forward:
+        navigateForward(args.tabInfo);
         break;
     case NavigationType::Redirect:
         updateUrlBar(convert(args.tabInfo.url));
+        // _tabBar->updateTabNavigation(_activeTabId, args.tabInfo.canGoBack, args.tabInfo.canGoForward);
         break;
     case NavigationType::Reload:
         // onUrlVisited(convert(args.tabInfo.url));
@@ -227,6 +257,18 @@ void  MainWindow::updateTabTitle(TabId id, std::string title)
 void MainWindow::reloadTab(TabId id)
 {
     _tabWidgets[id]->reload();
+}
+
+
+void MainWindow::navigateBack(TabInfo tabInfo)
+{
+    _tabWidgets[tabInfo.id]->back();
+    _tabBar->updateTabNavigation(tabInfo.id, tabInfo.canGoBack, tabInfo.canGoForward);
+}
+void MainWindow::navigateForward(TabInfo tabInfo)
+{
+    _tabWidgets[tabInfo.id]->forward();
+    _tabBar->updateTabNavigation(tabInfo.id, tabInfo.canGoBack, tabInfo.canGoForward);
 }
 
 void MainWindow::setupTabViewEvents(TabId tabId, QWebEngineView *tabView)
@@ -255,6 +297,7 @@ void MainWindow::setupTabViewEvents(TabId tabId, QWebEngineView *tabView)
             [this, id = tabId] (int progress) {
                 _core->changeTabLoadingProgress(id, progress);
             });
+
 }
 
 void MainWindow::onTabsLoaded(std::vector<TabInfo> tabs)
@@ -287,7 +330,6 @@ void MainWindow::onTabCreated(TabInfo tabInfo)
 
 
     setupTabViewEvents(tabInfo.id, tabWidget);
-
     tabWidget->load(convert(tabInfo.url));
     _tabWidgets[tabInfo.id] = std::move(tabWidget);
     onActiveTabChanged(tabInfo.id);
@@ -316,6 +358,21 @@ void MainWindow::updateUrlBar(QUrl newUrl)
     }
 }
 
+void MainWindow::onTabsModelDataChanged(const QModelIndex &topLeft,
+                                        const QModelIndex &bottomRight,
+                                        const QList<int> &roles)
+{
+    if (roles.contains(TabsModel::Roles::BackNavigatingRole))
+    {
+        _backButton->setEnabled(_tabsModel->index(topLeft.row(), 0).data(TabsModel::BackNavigatingRole).toBool());
+    }
+
+    if (roles.contains(TabsModel::Roles::ForwardNavigatingRole))
+    {
+        _forwardButton->setEnabled(_tabsModel->index(topLeft.row(), 0).data(TabsModel::ForwardNavigatingRole).toBool());
+    }
+}
+
 void MainWindow::onSearchEditingFinished()
 {
     // goToWebsite(_search->text());
@@ -324,10 +381,11 @@ void MainWindow::onSearchEditingFinished()
     _core->visitUrl(_activeTabId, Url(_search->text().toStdString()));
 }
 
-void MainWindow::onUrlVisited(Url url)
+void MainWindow::onUrlVisited(TabInfo tab)
 {
-    _tabBar->updateTabUrl(_activeTabId, url);
-    _tabWidgets[_activeTabId]->load(convert(url));
+    _tabBar->updateTabUrl(_activeTabId, tab.url);
+    _tabBar->updateTabNavigation(_activeTabId, tab.canGoBack, tab.canGoForward);
+    _tabWidgets[_activeTabId]->load(convert(tab.url));
 }
 
 
@@ -340,6 +398,10 @@ void MainWindow::onActiveTabChanged(TabId tabId) {
 
         it->second->setFocus();
         _activeTabId = tabId;
+
+        _backButton->setEnabled(_tabsModel->index(_tabsModel->getTabIndex(tabId), 0).data(TabsModel::BackNavigatingRole).toBool());
+        _forwardButton->setEnabled(_tabsModel->index(_tabsModel->getTabIndex(tabId), 0).data(TabsModel::ForwardNavigatingRole).toBool());
+
     }
 }
 

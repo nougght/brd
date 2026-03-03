@@ -17,8 +17,22 @@ set(TS_FILES desktop_ru_RU.ts)
 
 set(PROJECT_SOURCES
         main.cpp
-        mainwindow.cpp
-        mainwindow.h
+        ui/mainwindow.cpp
+        ui/mainwindow.h
+        ui/style.css
+        ui/tabbarwithcontrol.h
+        ui/tabbarwithcontrol.cpp
+
+        adapter/CoreAdapter.h
+        adapter/CoreAdapter.cpp
+
+        controllers/MainWindowController.h
+        controllers/TabsController.h
+        controllers/HistoryController.h
+        controllers/BookmarksController.h
+
+        models/tabsmodel.h
+        models/tabsmodel.cpp
         ${TS_FILES}
 )
 
@@ -26,10 +40,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(desktop
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        tabbarwithcontrol.h tabbarwithcontrol.cpp
-        style.css
-        resources.qrc
-        tabsmodel.h tabsmodel.cpp
     )
 
 qt_add_resources(desktop "resources.qrc")

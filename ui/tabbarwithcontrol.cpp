@@ -5,8 +5,9 @@
 #include "tabsmodel.h"
 
 
-TabBarWithControl::TabBarWithControl(QWidget *parent) : QFrame(parent)
+TabBarWithControl::TabBarWithControl(QWidget *parent, TabsModel *model) : QFrame(parent)
 {
+    _tabsModel = model;
     setupUI();
 }
 
@@ -27,7 +28,6 @@ void TabBarWithControl::setupUI()
     _tabsList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     connect(_tabsList, &QListView::clicked, this, &TabBarWithControl::onTabClicked);
 
-    _tabsModel = new TabsModel(this);
     // for (int i = 0; i < 6; ++i)
     // {
     //     model->addTab("вкладка " + QString::number(i));

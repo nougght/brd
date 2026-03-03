@@ -26,14 +26,14 @@ QFrame#centralWidget{
 }
 
 
-#reloadButton{
+#backButton, #forwardButton, #reloadButton{
     font-size: 20px;
     border: none;
     text-align:center;
     padding: 1px 8px 4px 8px;
     margin: 2px 0px 2px 10px;
 
-    background-color: transparent;
+    background-color: rgb(166, 211, 226);
     border-radius: 7px;
 }
 
@@ -64,8 +64,8 @@ QListView::item
 
 }
 
-#minimiseButton:hover, #newTabButton:hover, #reloadButton:hover {
-    background-color: lightgrey;
+#minimiseButton:hover, #newTabButton:hover, #backButton:hover, #forwardButoon:hover, #reloadButton:hover {
+    background-color: rgb(95, 121, 129);
 }
 
 #closeButton:hover {

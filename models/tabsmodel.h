@@ -31,8 +31,9 @@ public:
     {
         return _tabs[index].id;
     }
+
+    int getTabIndex(TabId id);
 private:
-    int _getTabIndex(TabId id);
 
     std::vector<TabInfo> _tabs;
 };

@@ -38,7 +38,7 @@ void TabsModel::addTab(const TabInfo &tab)
 }
 
 
-int TabsModel::_getTabIndex(TabId id)
+int TabsModel::getTabIndex(TabId id)
 {
     int i = 0;
     while (i < _tabs.size() && _tabs[i].id != id)
@@ -51,7 +51,7 @@ int TabsModel::_getTabIndex(TabId id)
 
 void TabsModel::updateTabUrl(TabId id, Url url)
 {
-    int ind = _getTabIndex(id);
+    int ind = getTabIndex(id);
 
     if (ind == -1)
         return;
@@ -61,7 +61,7 @@ void TabsModel::updateTabUrl(TabId id, Url url)
 
 void TabsModel::updateTabTitle(TabId id, std::string title)
 {
-    int ind = _getTabIndex(id);
+    int ind = getTabIndex(id);
 
     if (ind == -1)
         return;
@@ -71,7 +71,7 @@ void TabsModel::updateTabTitle(TabId id, std::string title)
 
 void TabsModel::updateTabLoading(TabId id, bool isLoading)
 {
-    int ind = _getTabIndex(id);
+    int ind = getTabIndex(id);
 
     if (ind == -1)
         return;
@@ -81,7 +81,7 @@ void TabsModel::updateTabLoading(TabId id, bool isLoading)
 
 void TabsModel::updateTabNavigation(TabId id, bool canGoBack, bool canGoForward)
 {
-    int ind = _getTabIndex(id);
+    int ind = getTabIndex(id);
 
     if (ind == -1)
         return;
