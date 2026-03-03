@@ -26,12 +26,9 @@ BrowserCore::BrowserCore() :  _tabManager(std::make_unique<TabManager>()), _even
                   tabClosed.invoke(id); })));
 
 
-          _subs.push_back(std::make_unique<Subscription<TabId>>(_tabManager->tabReloaded.subscribe(
-              [this] (TabId id) {
-                  navigationCompleted.invoke(NavigationCompletedArgs{
-                      NavigationType::Reload,
-                      _tabManager->getTab(id)->toTabInfo()
-                  });
+          _subs.push_back(std::make_unique<Subscription<NavigationCompletedArgs>>(_tabManager->navigationCompleted.subscribe(
+              [this] (NavigationCompletedArgs args) {
+                  navigationCompleted.invoke(args);
               })));
 
 
@@ -50,6 +47,7 @@ BrowserCore::BrowserCore() :  _tabManager(std::make_unique<TabManager>()), _even
     });
 
 }
+
 
 BrowserCore::~BrowserCore()
 {

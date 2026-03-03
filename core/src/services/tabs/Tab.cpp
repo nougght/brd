@@ -2,6 +2,7 @@
 
 Tab::Tab(TabId id, Url url) : _id(id), _url(url), _isLoading(false), _loadingProgress(0)
 {
+    _history.addUrl(url);
 }
 
 TabId Tab::getId()
@@ -26,7 +27,10 @@ bool Tab::isLoading()
 
 TabInfo Tab::toTabInfo()
 {
-    return {_id, _url, _title, _isLoading};
+    TabInfo info{_id, _url, _title,
+        canGoBack(), canGoForward(), _isLoading};
+    std::cerr << "\nTabInfo " << _id.value << "\n" << _url.value << "\n" << _title << "\n" << _isLoading << "\n" << info.canGoBack << "\n" << info.canGoForward << "\n\n";
+    return info;
 }
 
 bool Tab::canGoBack()
@@ -75,7 +79,8 @@ void Tab::goBack()
     _url = _history.currentItem()->url;
     _title = _history.currentItem()->title;
 
-    navigationCompleted.invoke(NavigationCompletedArgs{NavigationType::BackForward, toTabInfo()});
+
+    navigationCompleted.invoke(NavigationCompletedArgs{NavigationType::Back, toTabInfo()});
 }
 
 // void Tab::goBack()
@@ -110,7 +115,7 @@ void Tab::goForward()
     _url = _history.currentItem()->url;
     _title = _history.currentItem()->title;
 
-    navigationCompleted.invoke(NavigationCompletedArgs{NavigationType::BackForward, toTabInfo()});
+    navigationCompleted.invoke(NavigationCompletedArgs{NavigationType::Forward, toTabInfo()});
 }
 
 void Tab::changeTitle(std::string &title)

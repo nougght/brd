@@ -77,8 +77,10 @@ void TabManager::changeActiveTab(TabId id)
 
 void TabManager::reloadTab(TabId id)
 {
-    tabReloaded.invoke(id);
+    navigationCompleted.invoke(NavigationCompletedArgs{NavigationType::Reload, getTab(id)->toTabInfo()});
 }
+
+
 
 
 void TabManager::visitUrl(TabId id, Url url)
@@ -130,6 +132,30 @@ void TabManager::setTabLoadingStatus(TabId id, bool isLoading)
         loadingStatusChanged.invoke(TabLoadingStatusChangedArgs{id, isLoading});
     }
 }
+
+void TabManager::goBack(TabId id)
+{
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->goBack();
+        navigationCompleted.invoke(NavigationCompletedArgs{NavigationType::Back, getTab(id)->toTabInfo()});
+    }
+
+}
+
+void TabManager::goForward(TabId id)
+{
+    auto existing = _tabs.find(id);
+    if (existing != _tabs.end())
+    {
+        existing->second->goForward();
+        navigationCompleted.invoke(NavigationCompletedArgs{NavigationType::Forward, getTab(id)->toTabInfo()});
+    }
+}
+
+
+
 
 
 
@@ -205,23 +231,5 @@ bool TabManager::canGoForward(TabId id)
         return existing->second->canGoForward();
     }
     return false;
-}
-void TabManager::goBack(TabId id)
-{
-
-    auto existing = _tabs.find(id);
-    if (existing != _tabs.end())
-    {
-        existing->second->goBack();
-    }
-}
-void TabManager::goForward(TabId id)
-{
-
-    auto existing = _tabs.find(id);
-    if (existing != _tabs.end())
-    {
-        existing->second->goForward();
-    }
 }
 

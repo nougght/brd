@@ -78,7 +78,7 @@ public:
     // все вкладки закрыты
     Event<void> lastTabClosed;
 
-    Event<TabId> tabReloaded;
+    // Event<TabId> tabReloaded;
 };
 
 #endif
